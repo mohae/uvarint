@@ -25,10 +25,10 @@ func Decode(buf []byte) (uint64, int) {
 		return uint64(buf[0]), 1
 	}
 	if buf[0] >= 0xF1 && buf[0] <= 0xF8 {
-		return 240 + 256*(uint64(buf[0])-241)+ uint64(buf[1]), 2
+		return 240 + 256*(uint64(buf[0])-241) + uint64(buf[1]), 2
 	}
 	if buf[0] == 0xF9 {
-		return 2288+256*uint64(buf[1]) + uint64(buf[2]), 3
+		return 2288 + 256*uint64(buf[1]) + uint64(buf[2]), 3
 	}
 	if buf[0] == 0xFA {
 		return bigEndianToUint64(buf[1:4]), 4
@@ -51,7 +51,6 @@ func Decode(buf []byte) (uint64, int) {
 	// panic here
 	panic("decode: invalid varint")
 }
-
 
 // Encode encodes the received uint64 into varint using the minimum
 // necessary bytes.  The number of bytes written is returned.
@@ -82,14 +81,14 @@ func Encode(buf []byte, x uint64) int {
 		return 1
 	}
 	if x <= 2287 {
-		buf[0] = byte((x-240)/256+241)
-		buf[1] = byte((x-240)%256)
+		buf[0] = byte((x-240)/256 + 241)
+		buf[1] = byte((x - 240) % 256)
 		return 2
 	}
 	if x <= 67823 {
 		buf[0] = 0xF9
-		buf[1] = byte((x-2288)/256)
-		buf[2] = byte((x-2288)%256)
+		buf[1] = byte((x - 2288) / 256)
+		buf[2] = byte((x - 2288) % 256)
 		return 3
 	}
 	if x <= 16777215 {
