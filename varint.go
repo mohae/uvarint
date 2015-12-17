@@ -1,5 +1,6 @@
 // Package varint encodes and decodes SQLite4 variable length integers
-// which is an encoding of 64-bit unsigned integers into 1-9 bytes.
+// which is an encoding of 64-bit unsigned integers into 1-9 bytes
+// (varuint).
 // See: http://www.sqlite.org/src4/doc/trunk/www/varint.wiki
 package varint
 
@@ -10,8 +11,7 @@ package varint
 // Decode
 //
 // If A0 is between 0 and 240 inclusive, then the result is the value of A0.
-// If A0 is between 241 and 248 inclusive, then the result is
-//    240+256*(A0-241)+A1.
+// If A0 is between 241 and 248 inclusive, then the result is 240+256*(A0-241)+A1.
 // If A0 is 249 then the result is 2288+256*A1+A2.
 // If A0 is 250 then the result is A1..A3 as a 3-byte big-ending integer.
 // If A0 is 251 then the result is A1..A4 as a 4-byte big-ending integer.
@@ -59,18 +59,12 @@ func Decode(buf []byte) (uint64, int) {
 //
 // If V<=240 then output a single by A0 equal to V.
 // If V<=2287 then output A0 as (V-240)/256 + 241 and A1 as (V-240)%256.
-// If V<=67823 then output A0 as 249, A1 as (V-2288)/256, and A2
-//    as (V-2288)%256.
-// If V<=16777215 then output A0 as 250 and A1 through A3 as a big-endian
-//    3-byte integer.
-// If V<=4294967295 then output A0 as 251 and A1..A4 as a big-ending
-//    4-byte integer.
-// If V<=1099511627775 then output A0 as 252 and A1..A5 as a big-ending
-//    5-byte integer.
-// If V<=281474976710655 then output A0 as 253 and A1..A6 as a big-ending
-//    6-byte integer.
-// If V<=72057594037927935 then output A0 as 254 and A1..A7 as a big-ending
-//    7-byte integer.
+// If V<=67823 then output A0 as 249, A1 as (V-2288)/256, and A2 as (V-2288)%256.
+// If V<=16777215 then output A0 as 250 and A1 through A3 as a big-endian 3-byte integer.
+// If V<=4294967295 then output A0 as 251 and A1..A4 as a big-ending 4-byte integer.
+// If V<=1099511627775 then output A0 as 252 and A1..A5 as a big-ending 5-byte integer.
+// If V<=281474976710655 then output A0 as 253 and A1..A6 as a big-ending 6-byte integer.
+// If V<=72057594037927935 then output A0 as 254 and A1..A7 as a big-ending 7-byte integer.
 // Otherwise then output A0 as 255 and A1..A8 as a big-ending 8-byte integer.
 func Encode(buf []byte, x uint64) int {
 	if x < 241 {
