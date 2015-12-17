@@ -21,35 +21,32 @@ package varint
 // If A0 is 255 then the result is A1..A8 as a 8-byte big-ending integer.
 func Decode(buf []byte) (uint64, int) {
 	// check the first byte
-	if buf[0] >= 0 && buf[0] <= 0xF0 {
+	b := buf[0]
+	if b <= 0xF0 {
 		return uint64(buf[0]), 1
 	}
-	if buf[0] >= 0xF1 && buf[0] <= 0xF8 {
+	if b <= 0xF8 {
 		return 240 + 256*(uint64(buf[0])-241) + uint64(buf[1]), 2
 	}
-	if buf[0] == 0xF9 {
+	if b == 0xF9 {
 		return 2288 + 256*uint64(buf[1]) + uint64(buf[2]), 3
 	}
-	if buf[0] == 0xFA {
-		return bigEndianToUint64(buf[1:4]), 4
+	if b == 0xFA {
+		return  uint64(buf[1])<<16 | uint64(buf[2])<<8 | uint64(buf[3]), 4
 	}
-	if buf[0] == 0xFB {
-		return bigEndianToUint64(buf[1:5]), 5
+	if b == 0xFB {
+		return  uint64(buf[1])<<24 | uint64(buf[2])<<16 | uint64(buf[3])<<8 | uint64(buf[4]), 5
 	}
-	if buf[0] == 0xFC {
-		return bigEndianToUint64(buf[1:6]), 6
+	if b == 0xFC {
+		return uint64(buf[1])<<32 | uint64(buf[2])<<24 | uint64(buf[3])<<16 | uint64(buf[4])<<8 | uint64(buf[5]), 6
 	}
-	if buf[0] == 0xFD {
-		return bigEndianToUint64(buf[1:7]), 7
+	if b == 0xFD {
+		return uint64(buf[1])<<40 | uint64(buf[2])<<32 | uint64(buf[3])<<24 | uint64(buf[4])<<16 | uint64(buf[5])<<8 | uint64(buf[6]), 7
 	}
-	if buf[0] == 0xFE {
-		return bigEndianToUint64(buf[1:8]), 8
+	if b == 0xFE {
+		return uint64(buf[1])<<48 | uint64(buf[2])<<40 | uint64(buf[3])<<32 | uint64(buf[4])<<24 | uint64(buf[5])<<16 | uint64(buf[6])<<8 | uint64(buf[7]), 8
 	}
-	if buf[0] == 0xFF {
-		return bigEndianToUint64(buf[1:9]), 9
-	}
-	// panic here
-	panic("decode: invalid varint")
+	return uint64(buf[1])<<56 | uint64(buf[2])<<48 | uint64(buf[3])<<40 | uint64(buf[4])<<32 | uint64(buf[5])<<24 | uint64(buf[6])<<16 | uint64(buf[7])<<8 | uint64(buf[8]), 9
 }
 
 // Encode encodes the received uint64 into varint using the minimum
@@ -76,63 +73,74 @@ func Decode(buf []byte) (uint64, int) {
 //    7-byte integer.
 // Otherwise then output A0 as 255 and A1..A8 as a big-ending 8-byte integer.
 func Encode(buf []byte, x uint64) int {
-	if x <= 240 {
+	if x < 241 {
 		buf[0] = byte(x)
 		return 1
 	}
-	if x <= 2287 {
+	if x < 2288 {
 		buf[0] = byte((x-240)/256 + 241)
 		buf[1] = byte((x - 240) % 256)
 		return 2
 	}
-	if x <= 67823 {
+	if x < 67824 {
 		buf[0] = 0xF9
 		buf[1] = byte((x - 2288) / 256)
 		buf[2] = byte((x - 2288) % 256)
 		return 3
 	}
-	if x <= 16777215 {
+	if x < 1<<24 {
 		buf[0] = 0xFA
-		uint64ToBigEndian(buf[1:], x, 3)
+		buf[1] = byte(x>>16)
+		buf[2] = byte(x>>8)
+		buf[3] = byte(x)
 		return 4
 	}
-	if x <= 4294967295 {
+	if x < 1<<32 {
 		buf[0] = 0xFB
-		uint64ToBigEndian(buf[1:], x, 4)
+		buf[1] = byte(x>>24)
+		buf[2] = byte(x>>16)
+		buf[3] = byte(x>>8)
+		buf[4] = byte(x)
 		return 5
 	}
-	if x <= 1099511627775 {
+	if x < 1<<40 {
 		buf[0] = 0xFC
-		uint64ToBigEndian(buf[1:], x, 5)
+		buf[1] = byte(x>>32)
+		buf[2] = byte(x>>24)
+		buf[3] = byte(x>>16)
+		buf[4] = byte(x>>8)
+		buf[5] = byte(x)
 		return 6
 	}
-	if x <= 281474976710655 {
+	if x < 1<<48 {
 		buf[0] = 0xFD
-		uint64ToBigEndian(buf[1:], x, 6)
+		buf[1] = byte(x>>40)
+		buf[2] = byte(x>>32)
+		buf[3] = byte(x>>24)
+		buf[4] = byte(x>>16)
+		buf[5] = byte(x>>8)
+		buf[6] = byte(x)
 		return 7
 	}
-	if x <= 72057594037927935 {
+	if x < 1<<56 {
 		buf[0] = 0xFE
-		uint64ToBigEndian(buf[1:], x, 7)
+		buf[1] = byte(x>>48)
+		buf[2] = byte(x>>40)
+		buf[3] = byte(x>>32)
+		buf[4] = byte(x>>24)
+		buf[5] = byte(x>>16)
+		buf[6] = byte(x>>8)
+		buf[7] = byte(x)
 		return 8
 	}
 	buf[0] = 0xFF
-	uint64ToBigEndian(buf[1:], x, 8)
+	buf[1] = byte(x>>56)
+	buf[2] = byte(x>>48)
+	buf[3] = byte(x>>40)
+	buf[4] = byte(x>>32)
+	buf[5] = byte(x>>24)
+	buf[6] = byte(x>>16)
+	buf[7] = byte(x>>8)
+	buf[8] = byte(x)
 	return 9
-}
-
-// uint64ToBigEndian fills buf with x as a n byte big-endian integer
-func uint64ToBigEndian(buf []byte, x uint64, n int) {
-	for i := 0; i < n; i++ {
-		buf[i] = byte(x >> uint(8*(n-(i+1))))
-	}
-}
-
-// fromBigEndian takeks the contents of the buff and returns
-func bigEndianToUint64(buf []byte) uint64 {
-	var x uint64
-	for i := 0; i < len(buf); i++ {
-		x |= uint64(buf[i]) << uint(8*(len(buf)-(i+1)))
-	}
-	return x
 }
