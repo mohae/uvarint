@@ -2,7 +2,6 @@ package varint
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 )
 
@@ -61,22 +60,20 @@ func BenchmarkEncode(b *testing.B) {
 	var n int
 	b.SetBytes(8)
 	for i := 0; i < b.N; i++ {
-		for _, test := range tests{
-			n += Encode(buf, test.decoded)
+		for _, test := range tests {
+			n = Encode(buf, test.decoded)
 		}
 	}
-	fmt.Println(n)
+	_ = n
 }
 
 func BenchmarkDecode(b *testing.B) {
-	res := make([]uint64, len(tests))
-	res2 := make([]uint64, len(tests))
+	var res uint64
 	b.SetBytes(8)
 	for i := 0; i < b.N; i++ {
-		for j, test := range tests {
-			res[j], _ = Decode(test.encoded)
+		for _, test := range tests {
+			res, _ = Decode(test.encoded)
 		}
-		res2 = res
 	}
-	fmt.Println(len(res2))
+	_ = res
 }
