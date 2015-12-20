@@ -38,14 +38,14 @@ var tests = []struct {
 func TestVarInt(t *testing.T) {
 	for i, test := range tests {
 		b := make([]byte, len(test.encoded))
-		n := Encode(b, test.decoded)
+		n := PutUint64(b, test.decoded)
 		if n != test.n {
 			t.Errorf("encode %d: got %d want %d", i, n, test.n)
 		}
 		if !bytes.Equal(b, test.encoded) {
 			t.Errorf("encode %d: got %v want %v", i, b[0:n], test.encoded)
 		}
-		v, n := Decode(test.encoded)
+		v, n := Uint64(test.encoded)
 		if n != test.n {
 			t.Errorf("decode %d: got %d want %d", i, n, test.n)
 		}
@@ -55,24 +55,24 @@ func TestVarInt(t *testing.T) {
 	}
 }
 
-func BenchmarkEncode(b *testing.B) {
+func BenchmarkPutUint64(b *testing.B) {
 	buf := make([]byte, 9)
 	var n int
 	b.SetBytes(8)
 	for i := 0; i < b.N; i++ {
 		for _, test := range tests {
-			n = Encode(buf, test.decoded)
+			n = PutUint64(buf, test.decoded)
 		}
 	}
 	_ = n
 }
 
-func BenchmarkDecode(b *testing.B) {
+func BenchmarkUint64(b *testing.B) {
 	var res uint64
 	b.SetBytes(8)
 	for i := 0; i < b.N; i++ {
 		for _, test := range tests {
-			res, _ = Decode(test.encoded)
+			res, _ = Uint64(test.encoded)
 		}
 	}
 	_ = res

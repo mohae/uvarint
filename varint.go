@@ -4,7 +4,7 @@
 // See: http://www.sqlite.org/src4/doc/trunk/www/varint.wiki
 package varint
 
-// Decode decodes the received varint encoded byte slice; returning
+// Uint64 decodes the received varint encoded byte slice; returning
 // the value and the amount of bytes used.
 //
 // From: http://www.sqlite.org/src4/doc/trunk/www/varint.wiki
@@ -19,7 +19,7 @@ package varint
 // If A0 is 253 then the result is A1..A6 as a 6-byte big-ending integer.
 // If A0 is 254 then the result is A1..A7 as a 7-byte big-ending integer.
 // If A0 is 255 then the result is A1..A8 as a 8-byte big-ending integer.
-func Decode(buf []byte) (uint64, int) {
+func Uint64(buf []byte) (uint64, int) {
 	// check the first byte
 	b := buf[0]
 	if b <= 0xF0 {
@@ -49,7 +49,7 @@ func Decode(buf []byte) (uint64, int) {
 	return uint64(buf[1])<<56 | uint64(buf[2])<<48 | uint64(buf[3])<<40 | uint64(buf[4])<<32 | uint64(buf[5])<<24 | uint64(buf[6])<<16 | uint64(buf[7])<<8 | uint64(buf[8]), 9
 }
 
-// Encode encodes the received uint64 into varint using the minimum
+// PutUint64 encodes the received uint64 into varint using the minimum
 // necessary bytes.  The number of bytes written is returned.
 //
 // From: http://www.sqlite.org/src4/doc/trunk/www/varint.wiki
@@ -66,7 +66,7 @@ func Decode(buf []byte) (uint64, int) {
 // If V<=281474976710655 then output A0 as 253 and A1..A6 as a big-ending 6-byte integer.
 // If V<=72057594037927935 then output A0 as 254 and A1..A7 as a big-ending 7-byte integer.
 // Otherwise then output A0 as 255 and A1..A8 as a big-ending 8-byte integer.
-func Encode(buf []byte, x uint64) int {
+func PutUint64(buf []byte, x uint64) int {
 	if x < 241 {
 		buf[0] = byte(x)
 		return 1
