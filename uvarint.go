@@ -2,7 +2,7 @@
 // which is an encoding of 64-bit unsigned integers into 1-9 bytes
 // (varuint).
 // See: http://www.sqlite.org/src4/doc/trunk/www/varint.wiki
-package varint
+package uvarint
 
 // Uvarint decodes the received varint encoded byte slice; returning
 // the value and the amount of bytes used.
