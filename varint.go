@@ -22,29 +22,28 @@ package varint
 //    If A0 is 255 then the result is A1..A8 as a 8-byte big-endian integer.
 func Uint64(buf []byte) (uint64, int) {
 	// check the first byte
-	b := buf[0]
-	if b <= 0xF0 {
+	if buf[0] <= 0xF0 {
 		return uint64(buf[0]), 1
 	}
-	if b <= 0xF8 {
+	if buf[0] <= 0xF8 {
 		return 240 + 256*(uint64(buf[0])-241) + uint64(buf[1]), 2
 	}
-	if b == 0xF9 {
+	if buf[0] == 0xF9 {
 		return 2288 + 256*uint64(buf[1]) + uint64(buf[2]), 3
 	}
-	if b == 0xFA {
+	if buf[0] == 0xFA {
 		return uint64(buf[1])<<16 | uint64(buf[2])<<8 | uint64(buf[3]), 4
 	}
-	if b == 0xFB {
+	if buf[0] == 0xFB {
 		return uint64(buf[1])<<24 | uint64(buf[2])<<16 | uint64(buf[3])<<8 | uint64(buf[4]), 5
 	}
-	if b == 0xFC {
+	if buf[0] == 0xFC {
 		return uint64(buf[1])<<32 | uint64(buf[2])<<24 | uint64(buf[3])<<16 | uint64(buf[4])<<8 | uint64(buf[5]), 6
 	}
-	if b == 0xFD {
+	if buf[0] == 0xFD {
 		return uint64(buf[1])<<40 | uint64(buf[2])<<32 | uint64(buf[3])<<24 | uint64(buf[4])<<16 | uint64(buf[5])<<8 | uint64(buf[6]), 7
 	}
-	if b == 0xFE {
+	if buf[0] == 0xFE {
 		return uint64(buf[1])<<48 | uint64(buf[2])<<40 | uint64(buf[3])<<32 | uint64(buf[4])<<24 | uint64(buf[5])<<16 | uint64(buf[6])<<8 | uint64(buf[7]), 8
 	}
 	return uint64(buf[1])<<56 | uint64(buf[2])<<48 | uint64(buf[3])<<40 | uint64(buf[4])<<32 | uint64(buf[5])<<24 | uint64(buf[6])<<16 | uint64(buf[7])<<8 | uint64(buf[8]), 9
