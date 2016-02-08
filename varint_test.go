@@ -34,17 +34,17 @@ var tests = []struct {
 	{1<<64 - 1, 9, []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}},
 }
 
-func TestVarInt(t *testing.T) {
+func TestUvarint(t *testing.T) {
 	for i, test := range tests {
 		b := make([]byte, len(test.encoded))
-		n := PutUint64(b, test.decoded)
+		n := PutUvarint(b, test.decoded)
 		if n != test.n {
 			t.Errorf("encode %d: got %d want %d", i, n, test.n)
 		}
 		if !bytes.Equal(b, test.encoded) {
 			t.Errorf("encode %d: got %v want %v", i, b[0:n], test.encoded)
 		}
-		v, n := Uint64(test.encoded)
+		v, n := Uvarint(test.encoded)
 		if n != test.n {
 			t.Errorf("decode %d: got %d want %d", i, n, test.n)
 		}
@@ -55,59 +55,59 @@ func TestVarInt(t *testing.T) {
 }
 
 // Benchmark using all the tests
-func BenchmarkPutUint64All(b *testing.B) {
+func BenchmarkPutUvarintAll(b *testing.B) {
 	buf := make([]byte, 9)
 	var n int
 	for i := 0; i < b.N; i++ {
 		for _, test := range tests {
-			n = PutUint64(buf, test.decoded)
+			n = PutUvarint(buf, test.decoded)
 		}
 	}
 	_ = n
 }
 
-func BenchmarkUint64All(b *testing.B) {
+func BenchmarkUvarintAll(b *testing.B) {
 	var res uint64
 	for i := 0; i < b.N; i++ {
 		for _, test := range tests {
-			res, _ = Uint64(test.encoded)
+			res, _ = Uvarint(test.encoded)
 		}
 	}
 	_ = res
 }
 
 // Benchmark using a value < 241
-func BenchmarkPutUint64Min(b *testing.B) {
+func BenchmarkPutUvarintMin(b *testing.B) {
 	buf := make([]byte, 9)
 	var n int
 	for i := 0; i < b.N; i++ {
-		n = PutUint64(buf, tests[2].decoded)
+		n = PutUvarint(buf, tests[2].decoded)
 	}
 	_ = n
 }
 
-func BenchmarkUint64Min(b *testing.B) {
+func BenchmarkUvarintMin(b *testing.B) {
 	var res uint64
 	for i := 0; i < b.N; i++ {
-		res, _ = Uint64(tests[2].encoded)
+		res, _ = Uvarint(tests[2].encoded)
 	}
 	_ = res
 }
 
 // Benchmark using a avlue > 1<<56
-func BenchmarkPutUint64Max(b *testing.B) {
+func BenchmarkPutUvarintMax(b *testing.B) {
 	buf := make([]byte, 9)
 	var n int
 	for i := 0; i < b.N; i++ {
-		n = PutUint64(buf, tests[17].decoded)
+		n = PutUvarint(buf, tests[17].decoded)
 	}
 	_ = n
 }
 
-func BenchmarkUint64Max(b *testing.B) {
+func BenchmarkUvarintMax(b *testing.B) {
 	var res uint64
 	for i := 0; i < b.N; i++ {
-		res, _ = Uint64(tests[17].encoded)
+		res, _ = Uvarint(tests[17].encoded)
 	}
 	_ = res
 }
