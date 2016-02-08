@@ -54,7 +54,8 @@ func TestVarInt(t *testing.T) {
 	}
 }
 
-func BenchmarkPutUint64(b *testing.B) {
+// Benchmark using all the tests
+func BenchmarkPutUint64All(b *testing.B) {
 	buf := make([]byte, 9)
 	var n int
 	for i := 0; i < b.N; i++ {
@@ -65,12 +66,48 @@ func BenchmarkPutUint64(b *testing.B) {
 	_ = n
 }
 
-func BenchmarkUint64(b *testing.B) {
+func BenchmarkUint64All(b *testing.B) {
 	var res uint64
 	for i := 0; i < b.N; i++ {
 		for _, test := range tests {
 			res, _ = Uint64(test.encoded)
 		}
+	}
+	_ = res
+}
+
+// Benchmark using a value < 241
+func BenchmarkPutUint64Min(b *testing.B) {
+	buf := make([]byte, 9)
+	var n int
+	for i := 0; i < b.N; i++ {
+		n = PutUint64(buf, tests[2].decoded)
+	}
+	_ = n
+}
+
+func BenchmarkUint64Min(b *testing.B) {
+	var res uint64
+	for i := 0; i < b.N; i++ {
+		res, _ = Uint64(tests[2].encoded)
+	}
+	_ = res
+}
+
+// Benchmark using a avlue > 1<<56
+func BenchmarkPutUint64Max(b *testing.B) {
+	buf := make([]byte, 9)
+	var n int
+	for i := 0; i < b.N; i++ {
+		n = PutUint64(buf, tests[17].decoded)
+	}
+	_ = n
+}
+
+func BenchmarkUint64Max(b *testing.B) {
+	var res uint64
+	for i := 0; i < b.N; i++ {
+		res, _ = Uint64(tests[17].encoded)
 	}
 	_ = res
 }
