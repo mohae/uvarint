@@ -139,3 +139,13 @@ func PutUvarint(buf []byte, x uint64) int {
 	buf[8] = byte(x)
 	return 9
 }
+
+// Wrapper to PutUvarint().
+func Encode(buf []byte, x uint64) int {
+	return PutUvarint(buf, x)
+}
+
+// Wrapper to Uvarint().
+func Decode(buf []byte) (uint64, int) {
+	return Uvarint(buf)
+}

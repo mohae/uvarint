@@ -54,6 +54,26 @@ func TestUvarint(t *testing.T) {
 	}
 }
 
+func TestEncodeDecode(t *testing.T) {
+	for i, test := range tests {
+		b := make([]byte, len(test.encoded))
+		n := Encode(b, test.decoded)
+		if n != test.n {
+			t.Errorf("encode %d: got %d want %d", i, n, test.n)
+		}
+		if !bytes.Equal(b, test.encoded) {
+			t.Errorf("encode %d: got %v want %v", i, b[0:n], test.encoded)
+		}
+		v, n := Decode(test.encoded)
+		if n != test.n {
+			t.Errorf("decode %d: got %d want %d", i, n, test.n)
+		}
+		if v != test.decoded {
+			t.Errorf("decode %d: got %d want %d", i, v, test.decoded)
+		}
+	}
+}
+
 // Benchmark using all the tests
 func BenchmarkPutUvarintAll(b *testing.B) {
 	buf := make([]byte, 9)

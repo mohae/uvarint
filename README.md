@@ -31,5 +31,8 @@ Output:
     Encoded 1 bytes: 0x2a
     Decoded 1 bytes: 42
 
+## Notes:
+Two wrapper functions are also exposed:  `Encode` and `Decode`.  `Encode` is a wrapper to `PutUvarint`, while `Decode` wraps `Uvarint`.
+
 ## Doc  
 https://godoc.org/github.com/mohae/uvarint
